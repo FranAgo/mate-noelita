@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matemáticas desde cero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #FAF9F6;
+    --surface: #FFFFFF;
+    --surface2: #F3F1EC;
+    --border: rgba(0,0,0,0.08);
+    --border-md: rgba(0,0,0,0.14);
+    --text: #1A1915;
+    --muted: #6B6A65;
+    --hint: #9E9D98;
+    --purple-bg: #EEEDFE;
+    --purple: #534AB7;
+    --purple-dark: #3C3489;
+    --teal-bg: #E1F5EE;
+    --teal: #0F6E56;
+    --teal-dark: #085041;
+    --coral-bg: #FAECE7;
+    --coral: #993C1D;
+    --coral-dark: #712B13;
+    --green-bg: #EAF3DE;
+    --green: #27500A;
+    --green-border: #3B6D11;
+    --red-bg: #FCEBEB;
+    --red: #791F1F;
+    --red-border: #A32D2D;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* Decorative top bar */
+  .top-bar {
+    height: 3px;
+    background: linear-gradient(90deg, var(--purple) 0%, #9F99E8 40%, var(--teal) 70%, #5DCAA5 100%);
+  }
+
+  .app {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.on { display: block; }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.07); }
+    100% { transform: scale(1); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-6px); }
+    60%       { transform: translateX(6px); }
+  }
+  @keyframes fillBar {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+
+  .anim  { animation: fadeUp .4s ease both; }
+  .anim2 { animation: fadeUp .4s .08s ease both; }
+  .anim3 { animation: fadeUp .4s .16s ease both; }
+
+  /* HOME */
+  .home-header {
+    text-align: center;
+    padding: 3rem 1rem 2.5rem;
+  }
+  .home-eyebrow {
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .home-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(32px, 6vw, 46px);
+    color: var(--text);
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+  .home-title em { font-style: italic; color: var(--purple); }
+  .home-sub {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 2.5rem;
+  }
+  @media (max-width: 520px) {
+    .topic-grid { grid-template-columns: 1fr; }
+  }
+
+  .topic-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem 1rem 1.25rem;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color .2s, transform .15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .topic-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  .topic-btn.t-props::before { background: var(--purple-bg); }
+  .topic-btn.t-frac::before  { background: var(--teal-bg); }
+  .topic-btn.t-desp::before  { background: var(--coral-bg); }
+  .topic-btn:hover { border-color: var(--border-md); transform: translateY(-2px); }
+  .topic-btn:hover::before { opacity: 1; }
+
+  .topic-icon {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto .9rem;
+    font-size: 20px;
+    position: relative;
+  }
+  .topic-name {
+    font-size: 14px; font-weight: 500;
+    color: var(--text); margin-bottom: 4px;
+    position: relative;
+  }
+  .topic-desc {
+    font-size: 12px; color: var(--muted);
+    line-height: 1.5; position: relative;
+  }
+
+  /* LESSON */
+  .lesson-nav {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .back-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 13px; color: var(--muted);
+    display: flex; align-items: center; gap: 5px;
+    padding: 4px 0; transition: color .15s;
+  }
+  .back-btn:hover { color: var(--text); }
+  .step-counter { font-size: 12px; color: var(--hint); }
+
+  .progress-track {
+    height: 3px; background: var(--border);
+    border-radius: 2px; margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 2px;
+    transition: width .5s cubic-bezier(.4,0,.2,1);
+  }
+  .t-props .progress-fill { background: var(--purple); }
+  .t-frac  .progress-fill { background: var(--teal); }
+  .t-desp  .progress-fill { background: var(--coral); }
+
+  /* CONCEPT CARD */
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-bottom: 1.25rem;
+  }
+  .concept-tag {
+    display: inline-block;
+    font-size: 11px; letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+  .concept-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; line-height: 1.2;
+    color: var(--text); margin-bottom: .75rem;
+  }
+  .concept-body {
+    font-size: 15px; color: var(--muted);
+    line-height: 1.75; margin-bottom: 1rem;
+  }
+  .formula-box {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px; color: var(--text);
+    text-align: center; margin: 1rem 0;
+    line-height: 1.7;
+    border: 1px solid var(--border);
+  }
+  .concept-note {
+    font-size: 13px; color: var(--hint);
+    line-height: 1.6;
+    border-left: 2px solid var(--border-md);
+    padding-left: .75rem;
+  }
+
+  /* QUIZ CARD */
+  .quiz-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-bottom: 1.25rem;
+  }
+  .quiz-num {
+    font-size: 11px; color: var(--hint);
+    text-transform: uppercase; letter-spacing: .08em;
+    margin-bottom: .75rem;
+  }
+  .quiz-q {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px; color: var(--text);
+    line-height: 1.3; margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .opts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 1rem;
+  }
+  .opt {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .85rem 1rem;
+    font-size: 15px; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; text-align: center;
+    color: var(--text);
+    transition: border-color .15s, background .15s, transform .15s;
+  }
+  .opt:hover:not(.locked) {
+    background: var(--surface);
+    border-color: var(--border-md);
+    transform: translateY(-1px);
+  }
+  .opt.correct {
+    background: var(--green-bg);
+    border-color: var(--green-border);
+    color: var(--green);
+    animation: pop .35s ease;
+  }
+  .opt.wrong {
+    background: var(--red-bg);
+    border-color: var(--red-border);
+    color: var(--red);
+    animation: shake .35s ease;
+  }
+  .opt.locked { cursor: default; pointer-events: none; }
+
+  .feedback {
+    border-radius: var(--radius-sm);
+    padding: .9rem 1.1rem;
+    font-size: 14px; line-height: 1.65;
+    margin-bottom: .75rem; display: none;
+  }
+  .fb-ok  { background: var(--green-bg); color: var(--green);  border: 1px solid var(--green-border); }
+  .fb-err { background: var(--red-bg);   color: var(--red);    border: 1px solid var(--red-border); }
+
+  .hint-toggle {
+    font-size: 12px; color: var(--hint);
+    cursor: pointer; background: none; border: none;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+    transition: color .15s;
+  }
+  .hint-toggle:hover { color: var(--muted); }
+  .hint-box {
+    display: none;
+    margin-top: .6rem;
+    font-size: 13px; color: var(--muted);
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: .75rem 1rem; line-height: 1.6;
+    border: 1px solid var(--border);
+  }
+
+  /* BOTTOM NAV */
+  .lesson-footer {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-top: .5rem;
+  }
+  .btn-next {
+    background: var(--text);
+    color: var(--bg);
+    border: none; border-radius: var(--radius-sm);
+    padding: 11px 24px; font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500; cursor: pointer;
+    transition: opacity .2s, transform .15s;
+  }
+  .btn-next:hover:not(:disabled) { opacity: .85; transform: translateY(-1px); }
+  .btn-next:disabled { opacity: .3; cursor: default; }
+
+  /* DONE */
+  .done-wrap {
+    text-align: center; padding: 3rem 1rem;
+  }
+  .done-stars {
+    font-size: 36px; letter-spacing: 6px;
+    margin-bottom: 1rem;
+    animation: pop .5s ease;
+  }
+  .done-big {
+    font-family: 'DM Serif Display', serif;
+    font-size: 52px; color: var(--text);
+    line-height: 1; margin-bottom: .5rem;
+  }
+  .done-msg {
+    font-size: 16px; color: var(--muted);
+    margin-bottom: 2rem; line-height: 1.6;
+  }
+  .done-pills {
+    display: flex; gap: 10px;
+    justify-content: center; margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .done-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px; padding: 6px 16px;
+    font-size: 13px; color: var(--muted);
+  }
+  .done-pill span { color: var(--text); font-weight: 500; }
+  .done-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-sm);
+    padding: 10px 22px; font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer; color: var(--text);
+    transition: background .15s, border-color .15s;
+  }
+  .btn-outline:hover { background: var(--surface2); border-color: var(--border-md); }
+</style>
+</head>
+<body>
+<div class="top-bar"></div>
+<div class="app">
+
+  <!-- HOME -->
+  <div id="home" class="screen on">
+    <div class="home-header anim">
+      <div class="home-eyebrow">Repaso interactivo</div>
+      <h1 class="home-title">Matemáticas<br><em>desde cero</em></h1>
+      <p class="home-sub">Aprendé o repasá a tu ritmo. Cada tema empieza con una explicación clara y sigue con práctica.</p>
+    </div>
+    <div class="topic-grid">
+      <button class="topic-btn t-props anim" onclick="startTopic('props')">
+        <div class="topic-icon" style="background:#EEEDFE">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect x="2" y="2" width="7" height="7" rx="2" fill="#534AB7"/>
+            <rect x="11" y="2" width="7" height="7" rx="2" fill="#534AB7" opacity=".5"/>
+            <rect x="2" y="11" width="7" height="7" rx="2" fill="#534AB7" opacity=".5"/>
+            <rect x="11" y="11" width="7" height="7" rx="2" fill="#534AB7"/>
+          </svg>
+        </div>
+        <div class="topic-name">Propiedades</div>
+        <div class="topic-desc">Conmutativa, asociativa, distributiva</div>
+      </button>
+      <button class="topic-btn t-frac anim2" onclick="startTopic('frac')">
+        <div class="topic-icon" style="background:#E1F5EE">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <text x="10" y="9" font-size="7" fill="#0F6E56" text-anchor="middle" font-family="serif">a</text>
+            <line x1="4" y1="11" x2="16" y2="11" stroke="#0F6E56" stroke-width="1.5"/>
+            <text x="10" y="18" font-size="7" fill="#0F6E56" text-anchor="middle" font-family="serif">b</text>
+          </svg>
+        </div>
+        <div class="topic-name">Fracciones</div>
+        <div class="topic-desc">Sumar, restar, multiplicar, simplificar</div>
+      </button>
+      <button class="topic-btn t-desp anim3" onclick="startTopic('desp')">
+        <div class="topic-icon" style="background:#FAECE7">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <text x="2" y="15" font-size="14" fill="#993C1D" font-family="serif" font-weight="bold">x=</text>
+          </svg>
+        </div>
+        <div class="topic-name">Despeje de x</div>
+        <div class="topic-desc">Encontrá el valor de la incógnita</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- LESSON -->
+  <div id="lesson" class="screen">
+    <div class="lesson-nav">
+      <button class="back-btn" onclick="goHome()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Volver
+      </button>
+      <span class="step-counter" id="step-lbl"></span>
+    </div>
+    <div class="progress-track" id="prog-track">
+      <div class="progress-fill" id="prog" style="width:0%"></div>
+    </div>
+    <div id="lesson-body"></div>
+    <div class="lesson-footer">
+      <div></div>
+      <button class="btn-next" id="btn-next" onclick="nextStep()">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- DONE -->
+  <div id="done" class="screen">
+    <div class="done-wrap anim">
+      <div class="done-stars" id="done-stars"></div>
+      <div class="done-big" id="done-score"></div>
+      <div class="done-msg" id="done-msg"></div>
+      <div class="done-pills" id="done-pills"></div>
+      <div class="done-btns">
+        <button class="btn-outline" onclick="replayTopic()">Repetir tema</button>
+        <button class="btn-next" onclick="goHome()">Elegir otro tema</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TOPICS = {
+  props: {
+    color: 'purple', name: 'Propiedades',
+    steps: [
+      { type: 'concept', tag: 'propiedad conmutativa', tagBg: '#EEEDFE', tagColor: '#3C3489',
+        title: 'El orden no cambia el resultado',
+        body: 'Cuando sumás o multiplicás, podés cambiar el orden de los números y el resultado es el mismo. Funciona para la suma y la multiplicación.',
+        formula: '3 + 5 = 5 + 3 = 8 &nbsp;|&nbsp; 4 × 2 = 2 × 4 = 8',
+        note: 'Importante: esto NO vale para la resta ni la división. 5 − 3 ≠ 3 − 5.' },
+      { type: 'quiz', q: '¿Cuál es lo mismo que 7 + 4?', opts: ['4 + 7','7 − 4','4 × 7','4 + 4'], ans: 0,
+        ok: 'Exacto. Conmutativa de la suma: el orden no importa.',
+        err: 'Acordate: la conmutativa dice que podés dar vuelta el orden en sumas y multiplicaciones.' },
+      { type: 'concept', tag: 'propiedad asociativa', tagBg: '#EEEDFE', tagColor: '#3C3489',
+        title: 'Cómo agrupás tampoco cambia el resultado',
+        body: 'Si tenés tres o más números, podés agruparlos de distintas maneras con paréntesis y el resultado es el mismo.',
+        formula: '(2 + 3) + 4 = 2 + (3 + 4) = 9',
+        note: 'Útil cuando un agrupamiento hace el cálculo más fácil mentalmente.' },
+      { type: 'quiz', q: '¿Cuánto es (5 + 3) + 7?', opts: ['14','13','15','16'], ans: 2,
+        ok: 'Correcto, son 15. Y también podés calcularlo como 5 + (3 + 7) = 15. Misma respuesta.',
+        err: '(5 + 3) + 7 = 8 + 7 = 15. Asociativa: podés agrupar como quieras.' },
+      { type: 'concept', tag: 'propiedad distributiva', tagBg: '#EEEDFE', tagColor: '#3C3489',
+        title: 'Multiplicar repartiendo',
+        body: 'Cuando multiplicás un número por una suma, podés "distribuir" esa multiplicación a cada término adentro del paréntesis.',
+        formula: '3 × (4 + 2) = 3×4 + 3×2 = 12 + 6 = 18',
+        note: '¡Esta propiedad es clave para álgebra y para calcular mentalmente!' },
+      { type: 'quiz', q: '¿Cuánto es 5 × (3 + 2)?', opts: ['10','25','15','20'], ans: 1,
+        ok: 'Perfecto. 5 × 5 = 25. O bien: 5×3 + 5×2 = 15 + 10 = 25.',
+        err: '5 × (3 + 2) = 5 × 5 = 25. También: 5×3 + 5×2 = 15 + 10 = 25.' },
+      { type: 'quiz', q: '¿Cuál usa la distributiva correctamente?', opts: ['4×(2+3) = 4×2 + 4×3','4×(2+3) = 4×2 + 3','4×(2+3) = (4+2)×(4+3)','4×(2+3) = 4+2×3'], ans: 0,
+        ok: 'Excelente. Distribuís el 4 a cada término del paréntesis.',
+        err: 'La distributiva dice: multiplicás el número de afuera por CADA término adentro. Solo la primera lo hace bien.' },
+    ]
+  },
+  frac: {
+    color: 'teal', name: 'Fracciones',
+    steps: [
+      { type: 'concept', tag: '¿qué es una fracción?', tagBg: '#E1F5EE', tagColor: '#085041',
+        title: 'Una fracción representa una parte de algo',
+        body: 'El número de arriba (numerador) dice cuántas partes tenés. El de abajo (denominador) dice en cuántas partes está dividido el todo.',
+        formula: '3/4 → el "todo" está dividido en 4 partes, y vos tenés 3',
+        note: 'Ejemplo cotidiano: comiste 3 de las 4 porciones de una pizza = 3/4 de la pizza.' },
+      { type: 'concept', tag: 'sumar fracciones', tagBg: '#E1F5EE', tagColor: '#085041',
+        title: 'Para sumar, necesitás el mismo denominador',
+        body: 'Si los denominadores son iguales, sumás los numeradores y listo. Si son distintos, buscás el número que sea múltiplo de ambos denominadores.',
+        formula: '1/4 + 2/4 = 3/4 &nbsp;|&nbsp; 1/2 + 1/3 = 3/6 + 2/6 = 5/6',
+        note: 'Para 1/2 + 1/3: el denominador común es 6 (el mínimo múltiplo de 2 y de 3).' },
+      { type: 'quiz', q: '¿Cuánto es 1/4 + 1/4?', opts: ['2/8','2/4','1/8','1/2'], ans: 1,
+        ok: 'Bien. Mismo denominador: 1 + 1 = 2, queda 2/4. (Que también se puede simplificar a 1/2.)',
+        err: 'Cuando los denominadores son iguales, solo sumás los numeradores: 1 + 1 = 2, denominador queda 4.' },
+      { type: 'concept', tag: 'multiplicar fracciones', tagBg: '#E1F5EE', tagColor: '#085041',
+        title: 'Multiplicar es más simple de lo que parece',
+        body: 'Multiplicás numerador con numerador, y denominador con denominador. Sin necesitar denominador común.',
+        formula: '2/3 × 3/4 = (2×3)/(3×4) = 6/12 = 1/2',
+        note: 'Después de multiplicar, fijate si podés simplificar la fracción resultante.' },
+      { type: 'quiz', q: '¿Cuánto es 1/2 × 2/3?', opts: ['3/6','2/6','1/3','2/5'], ans: 2,
+        ok: 'Correcto. 1×2 = 2 arriba, 2×3 = 6 abajo → 2/6 = 1/3.',
+        err: '1/2 × 2/3 = (1×2)/(2×3) = 2/6 = 1/3. Numeradores entre sí, denominadores entre sí.' },
+      { type: 'quiz', q: 'Simplificá: 6/9', opts: ['3/4','2/3','1/2','6/9'], ans: 1,
+        ok: 'Exacto. MCD(6,9) = 3. Dividís ambos por 3: 6/9 = 2/3.',
+        err: 'Buscá el máximo número que divide a ambos. MCD(6,9) = 3 → 6÷3=2, 9÷3=3 → 2/3.' },
+    ]
+  },
+  desp: {
+    color: 'coral', name: 'Despeje de x',
+    steps: [
+      { type: 'concept', tag: '¿qué es despejar?', tagBg: '#FAECE7', tagColor: '#712B13',
+        title: 'Despejar es dejar la x sola',
+        body: 'Una ecuación dice que dos cosas son iguales. Tu objetivo es mover todos los números al otro lado para que x quede sola. La regla de oro: lo que hacés de un lado, lo hacés del otro.',
+        formula: 'x + 3 = 7 → x = 7 − 3 → x = 4',
+        note: 'Si algo está sumando, lo pasás restando. Si multiplica, lo pasás dividiendo.' },
+      { type: 'quiz', q: 'x + 5 = 12 → x = ?', opts: ['17','7','60','5'], ans: 1,
+        ok: 'Bien. Restás 5 de los dos lados: x = 12 − 5 = 7.',
+        err: 'Pasás el 5 restando al otro lado: x = 12 − 5 = 7.' },
+      { type: 'concept', tag: 'multiplicación y división', tagBg: '#FAECE7', tagColor: '#712B13',
+        title: 'Si la x está multiplicada, dividís',
+        body: 'Cuando x tiene un número multiplicándola, dividís ambos lados por ese número para aislarla.',
+        formula: '3x = 15 → x = 15 ÷ 3 → x = 5',
+        note: 'Y al revés: si x está dividida, multiplicás. x/4 = 3 → x = 3 × 4 = 12.' },
+      { type: 'quiz', q: '2x = 18 → x = ?', opts: ['16','36','9','2'], ans: 2,
+        ok: 'Correcto. Dividís los dos lados por 2: x = 18 ÷ 2 = 9.',
+        err: 'Si 2x = 18, dividís ambos lados por 2: x = 9.' },
+      { type: 'concept', tag: 'ecuaciones de dos pasos', tagBg: '#FAECE7', tagColor: '#712B13',
+        title: 'Ecuaciones con dos operaciones',
+        body: 'Cuando hay suma y multiplicación, primero resolvés la suma (pasás el número al otro lado), y después la multiplicación.',
+        formula: '2x + 3 = 11 → 2x = 8 → x = 4',
+        note: 'Primero aislás el término con x, después aislás la x sola.' },
+      { type: 'quiz', q: '3x − 6 = 9 → x = ?', opts: ['1','5','3','6'], ans: 1,
+        ok: 'Excelente. 3x = 15 → x = 5. Lo resolviste en dos pasos.',
+        err: 'Paso 1: sumás 6 → 3x = 15. Paso 2: dividís por 3 → x = 5.' },
+      { type: 'quiz', q: 'x/2 + 1 = 4 → x = ?', opts: ['6','10','3','8'], ans: 0,
+        ok: 'Perfecto. Restás 1 → x/2 = 3. Multiplicás por 2 → x = 6.',
+        err: 'x/2 + 1 = 4 → x/2 = 3 → x = 6. Primero sacás el +1, luego deshacés la división.' },
+    ]
+  }
+};
+
+let cur = { topic: null, step: 0, correct: 0, total: 0, answered: false };
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+
+function goHome() {
+  cur = { topic: null, step: 0, correct: 0, total: 0, answered: false };
+  show('home');
+}
+
+function replayTopic() { startTopic(cur.topic); }
+
+function startTopic(key) {
+  cur = { topic: key, step: 0, correct: 0, total: 0, answered: false };
+  const track = document.getElementById('prog-track');
+  track.className = 'progress-track t-' + key;
+  show('lesson');
+  renderStep();
+}
+
+function renderStep() {
+  const t = TOPICS[cur.topic];
+  const steps = t.steps;
+  const s = steps[cur.step];
+  const pct = Math.round((cur.step / steps.length) * 100);
+  document.getElementById('prog').style.width = pct + '%';
+  document.getElementById('step-lbl').textContent = 'Paso ' + (cur.step + 1) + ' de ' + steps.length + ' · ' + t.name;
+
+  const body = document.getElementById('lesson-body');
+  const next = document.getElementById('btn-next');
+
+  if (s.type === 'concept') {
+    body.innerHTML = `
+      <div class="concept-card anim">
+        <span class="concept-tag" style="background:${s.tagBg};color:${s.tagColor}">${s.tag}</span>
+        <div class="concept-title">${s.title}</div>
+        <div class="concept-body">${s.body}</div>
+        <div class="formula-box">${s.formula}</div>
+        <div class="concept-note">${s.note}</div>
+      </div>`;
+    next.textContent = 'Entendido →';
+    cur.answered = true;
+  } else {
+    const quizNum = steps.slice(0, cur.step + 1).filter(x => x.type === 'quiz').length;
+    const quizTotal = steps.filter(x => x.type === 'quiz').length;
+    body.innerHTML = `
+      <div class="quiz-card anim">
+        <div class="quiz-num">Pregunta ${quizNum} de ${quizTotal}</div>
+        <div class="quiz-q">${s.q}</div>
+        <div class="opts" id="opts-wrap">
+          ${s.opts.map((o, i) => `<button class="opt" onclick="pick(${i})">${o}</button>`).join('')}
+        </div>
+        <div class="feedback" id="fb"></div>
+        <button class="hint-toggle" onclick="toggleHint()">ver una pista</button>
+        <div class="hint-box" id="hint-box">Pensá en la definición que vimos antes. ¿Qué operación está aplicando?</div>
+      </div>`;
+    next.textContent = 'Siguiente →';
+    cur.answered = false;
+  }
+  next.disabled = !cur.answered;
+  next.style.opacity = cur.answered ? '1' : '.3';
+}
+
+function toggleHint() {
+  const h = document.getElementById('hint-box');
+  h.style.display = h.style.display === 'block' ? 'none' : 'block';
+}
+
+function pick(i) {
+  if (cur.answered) return;
+  cur.answered = true;
+  cur.total++;
+  const s = TOPICS[cur.topic].steps[cur.step];
+  const opts = document.querySelectorAll('.opt');
+  const fb = document.getElementById('fb');
+  opts.forEach(o => o.classList.add('locked'));
+  fb.style.display = 'block';
+  if (i === s.ans) {
+    cur.correct++;
+    opts[i].classList.add('correct');
+    fb.className = 'feedback fb-ok';
+    fb.textContent = s.ok;
+  } else {
+    opts[i].classList.add('wrong');
+    opts[s.ans].classList.add('correct');
+    fb.className = 'feedback fb-err';
+    fb.textContent = s.err;
+  }
+  const next = document.getElementById('btn-next');
+  next.disabled = false;
+  next.style.opacity = '1';
+}
+
+function nextStep() {
+  cur.step++;
+  if (cur.step >= TOPICS[cur.topic].steps.length) { showDone(); return; }
+  cur.answered = false;
+  renderStep();
+}
+
+function showDone() {
+  const pct = cur.total > 0 ? Math.round((cur.correct / cur.total) * 100) : 100;
+  const stars = pct >= 80 ? '★★★' : pct >= 50 ? '★★☆' : '★☆☆';
+  const msgs = [
+    'Seguí practicando, vas por buen camino.',
+    'Muy bien, estás entendiendo la idea.',
+    'Excelente, lo dominás perfectamente.'
+  ];
+  const idx = pct >= 80 ? 2 : pct >= 50 ? 1 : 0;
+  document.getElementById('done-stars').textContent = stars;
+  document.getElementById('done-score').textContent = cur.correct + '/' + cur.total;
+  document.getElementById('done-msg').textContent = msgs[idx];
+  document.getElementById('done-pills').innerHTML = `
+    <div class="done-pill">Precisión <span>${pct}%</span></div>
+    <div class="done-pill">Tema <span>${TOPICS[cur.topic].name}</span></div>`;
+  show('done');
+}
+</script>
+</body>
+</html>
