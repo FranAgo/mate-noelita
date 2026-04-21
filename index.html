@@ -1,0 +1,330 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}60%{transform:translateX(6px)}}
+@keyframes barFill{from{width:0}to{width:var(--w)}}
+.anim{animation:fadeUp .35s ease both}
+.anim2{animation:fadeUp .35s .1s ease both}
+.anim3{animation:fadeUp .35s .2s ease both}
+
+.screen{display:none;padding:1.5rem 0}
+.screen.on{display:block}
+
+.hero{text-align:center;padding:2rem 1rem 1.5rem}
+.hero-title{font-size:26px;font-weight:500;color:var(--color-text-primary);margin-bottom:.5rem}
+.hero-sub{font-size:15px;color:var(--color-text-secondary);line-height:1.6;max-width:420px;margin:0 auto 1.5rem}
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:.5rem}
+.topic-btn{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem 1rem;cursor:pointer;text-align:center;transition:border-color .15s,background .15s}
+.topic-btn:hover{background:var(--color-background-secondary);border-color:var(--color-border-primary)}
+.topic-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .75rem;font-size:16px}
+.topic-name{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.topic-desc{font-size:12px;color:var(--color-text-secondary);margin-top:3px}
+
+.lesson-wrap{max-width:560px;margin:0 auto}
+.progress-bar-wrap{height:4px;background:var(--color-border-tertiary);border-radius:2px;margin-bottom:1.5rem;overflow:hidden}
+.progress-fill{height:100%;background:var(--color-text-secondary);border-radius:2px;transition:width .4s ease}
+.step-label{font-size:12px;color:var(--color-text-tertiary);margin-bottom:1rem}
+
+.concept-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.5rem;margin-bottom:1rem}
+.concept-tag{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;margin-bottom:.75rem}
+.concept-title{font-size:17px;font-weight:500;color:var(--color-text-primary);margin-bottom:.5rem}
+.concept-body{font-size:14px;color:var(--color-text-secondary);line-height:1.7}
+.formula-box{font-family:var(--font-mono);font-size:15px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem 1rem;margin:1rem 0;color:var(--color-text-primary);text-align:center}
+
+.ex-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.5rem;margin-bottom:1rem}
+.ex-q{font-size:20px;font-weight:500;color:var(--color-text-primary);margin-bottom:1.25rem;text-align:center}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.opt{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:.75rem;font-size:15px;cursor:pointer;text-align:center;color:var(--color-text-primary);transition:all .15s;font-weight:400}
+.opt:hover:not(.locked){background:var(--color-background-primary);border-color:var(--color-border-primary)}
+.opt.correct{background:#EAF3DE;border-color:#3B6D11;color:#27500A;animation:pop .35s ease}
+.opt.wrong{background:#FCEBEB;border-color:#A32D2D;color:#791F1F;animation:shake .35s ease}
+.opt.locked{cursor:default;pointer-events:none}
+
+.fb-box{border-radius:var(--border-radius-md);padding:.9rem 1rem;font-size:14px;line-height:1.6;margin-bottom:1rem;display:none}
+.fb-ok{background:#EAF3DE;color:#27500A;border:0.5px solid #3B6D11}
+.fb-err{background:#FCEBEB;color:#791F1F;border:0.5px solid #A32D2D}
+
+.step-btns{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:.5rem}
+.btn-main{padding:9px 22px;font-size:14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;cursor:pointer;color:var(--color-text-primary);font-weight:500;transition:all .15s}
+.btn-main:hover{background:var(--color-background-secondary)}
+.btn-main:active{transform:scale(.98)}
+.btn-sm{padding:6px 14px;font-size:13px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:transparent;cursor:pointer;color:var(--color-text-secondary);transition:all .15s}
+.btn-sm:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+
+.result-screen{text-align:center;padding:2rem 1rem}
+.result-big{font-size:48px;font-weight:500;color:var(--color-text-primary);margin:.5rem 0}
+.result-sub{font-size:15px;color:var(--color-text-secondary);margin-bottom:1.5rem}
+.stars{font-size:28px;letter-spacing:4px;margin-bottom:1rem}
+.xp-row{display:flex;gap:10px;justify-content:center;margin-bottom:1.5rem;flex-wrap:wrap}
+.xp-pill{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:20px;padding:6px 14px;font-size:13px;color:var(--color-text-secondary)}
+.xp-pill span{color:var(--color-text-primary);font-weight:500}
+
+.hint-toggle{font-size:12px;color:var(--color-text-tertiary);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+.hint-toggle:hover{color:var(--color-text-secondary)}
+.hint-content{display:none;font-size:13px;color:var(--color-text-secondary);background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem 1rem;margin-top:.5rem;line-height:1.6}
+</style>
+
+<h2 class="sr-only">Práctica interactiva de matemáticas: propiedades, fracciones y despeje</h2>
+
+<div id="home" class="screen on">
+  <div class="hero anim">
+    <div class="hero-title">Matemáticas desde cero</div>
+    <div class="hero-sub">Aprendé o repasá a tu ritmo. Cada tema empieza con una explicación y sigue con práctica.</div>
+  </div>
+  <div class="topic-grid anim2">
+    <button class="topic-btn" onclick="startTopic('props')">
+      <div class="topic-icon" style="background:#EEEDFE">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" fill="#534AB7"/><rect x="9" y="2" width="5" height="5" rx="1" fill="#534AB7"/><rect x="2" y="9" width="5" height="5" rx="1" fill="#534AB7"/><rect x="9" y="9" width="5" height="5" rx="1" fill="#534AB7"/></svg>
+      </div>
+      <div class="topic-name">Propiedades</div>
+      <div class="topic-desc">Conmutativa, asociativa, distributiva</div>
+    </button>
+    <button class="topic-btn" onclick="startTopic('frac')">
+      <div class="topic-icon" style="background:#E1F5EE">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="4" y1="8" x2="12" y2="8" stroke="#0F6E56" stroke-width="1.5"/><text x="7.5" y="6" font-size="5" fill="#0F6E56" text-anchor="middle">a</text><text x="7.5" y="13" font-size="5" fill="#0F6E56" text-anchor="middle">b</text></svg>
+      </div>
+      <div class="topic-name">Fracciones</div>
+      <div class="topic-desc">Sumar, restar, multiplicar, simplificar</div>
+    </button>
+    <button class="topic-btn" onclick="startTopic('desp')">
+      <div class="topic-icon" style="background:#FAECE7">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><text x="1" y="12" font-size="11" fill="#993C1D" font-weight="500">x=</text></svg>
+      </div>
+      <div class="topic-name">Despeje de x</div>
+      <div class="topic-desc">Encontrá el valor de la incógnita</div>
+    </button>
+  </div>
+</div>
+
+<div id="lesson" class="screen">
+  <div class="lesson-wrap">
+    <div class="progress-bar-wrap"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+    <div class="step-label" id="step-lbl"></div>
+    <div id="lesson-body"></div>
+    <div class="step-btns">
+      <button class="btn-sm" onclick="goHome()">← volver</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-main" id="btn-next" onclick="nextStep()">Siguiente →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="done" class="screen">
+  <div class="lesson-wrap result-screen anim">
+    <div class="stars" id="done-stars"></div>
+    <div class="result-big" id="done-score"></div>
+    <div class="result-sub" id="done-msg"></div>
+    <div class="xp-row" id="done-pills"></div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn-main" onclick="replayTopic()">Repetir tema</button>
+      <button class="btn-main" onclick="goHome()">Elegir otro tema</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TOPICS={
+  props:{
+    color:'#EEEDFE',accent:'#534AB7',name:'Propiedades',
+    steps:[
+      {type:'concept',tag:'propiedad conmutativa',tagStyle:'background:#EEEDFE;color:#3C3489',
+       title:'El orden no cambia el resultado',
+       body:'Cuando sumás o multiplicás, podés cambiar el orden de los números y el resultado es el mismo.',
+       formula:'3 + 5 = 5 + 3 = 8 \u00a0\u00a0|\u00a0\u00a0 4 \u00d7 2 = 2 \u00d7 4 = 8',
+       note:'Importante: esto NO vale para la resta ni la división. 5 − 3 ≠ 3 − 5.'},
+      {type:'quiz',q:'¿Cuál es lo mismo que 7 + 4?',opts:['4 + 7','7 − 4','4 × 7','4 + 4'],ans:0,
+       ok:'Exacto. Conmutativa de la suma: el orden no importa.',
+       err:'Acordate: conmutativa significa que podés dar vuelta el orden en sumas y multiplicaciones.'},
+      {type:'concept',tag:'propiedad asociativa',tagStyle:'background:#EEEDFE;color:#3C3489',
+       title:'Cómo agrupás tampoco cambia el resultado',
+       body:'Si tenés tres o más números, podés agruparlos de distintas maneras y el resultado es el mismo.',
+       formula:'(2 + 3) + 4 = 2 + (3 + 4) = 9',
+       note:'Útil cuando un agrupamiento hace el cálculo más fácil.'},
+      {type:'quiz',q:'¿Cuánto es (5 + 3) + 7?',opts:['14','13','15','16'],ans:2,
+       ok:'Correcto, son 15. Y también podés calcularlo como 5 + (3 + 7) = 15. Misma respuesta.',
+       err:'(5 + 3) + 7 = 8 + 7 = 15. Asociativa: podés agrupar como quieras.'},
+      {type:'concept',tag:'propiedad distributiva',tagStyle:'background:#EEEDFE;color:#3C3489',
+       title:'Multiplicar repartiendo',
+       body:'Cuando multiplicás un número por una suma, podés "distribuir" esa multiplicación a cada término adentro del paréntesis.',
+       formula:'3 × (4 + 2) = 3×4 + 3×2 = 12 + 6 = 18',
+       note:'¡Esta propiedad es clave para álgebra y para calcular mentalmente!'},
+      {type:'quiz',q:'¿Cuánto es 5 × (3 + 2)?',opts:['10','25','15','20'],ans:1,
+       ok:'Perfecto. 5 × 5 = 25. O bien: 5×3 + 5×2 = 15 + 10 = 25.',
+       err:'5 × (3 + 2) = 5 × 5 = 25. También: 5×3 + 5×2 = 15 + 10 = 25.'},
+      {type:'quiz',q:'¿Cuál usa la propiedad distributiva correctamente?',opts:['4×(2+3) = 4×2 + 4×3','4×(2+3) = 4×2 + 3','4×(2+3) = (4+2)×(4+3)','4×(2+3) = 4+2×3'],ans:0,
+       ok:'Excelente. Distribuís el 4 a cada término del paréntesis.',
+       err:'La distributiva dice: multiplicás el número de afuera por CADA término adentro. Solo la primera opción lo hace bien.'},
+    ]
+  },
+  frac:{
+    color:'#E1F5EE',accent:'#0F6E56',name:'Fracciones',
+    steps:[
+      {type:'concept',tag:'¿qué es una fracción?',tagStyle:'background:#E1F5EE;color:#085041',
+       title:'Una fracción representa una parte de algo',
+       body:'El número de arriba (numerador) dice cuántas partes tenés. El de abajo (denominador) dice en cuántas partes está dividido el todo.',
+       formula:'3/4 → el "todo" está dividido en 4 partes, y vos tenés 3',
+       note:'Ejemplo cotidiano: comiste 3 de las 4 porciones de una pizza = 3/4 de la pizza.'},
+      {type:'concept',tag:'sumar fracciones',tagStyle:'background:#E1F5EE;color:#085041',
+       title:'Para sumar, necesitás el mismo denominador',
+       body:'Si los denominadores son iguales, sumás los numeradores y listo. Si son distintos, buscás el denominador común.',
+       formula:'1/4 + 2/4 = 3/4 \u00a0\u00a0|\u00a0\u00a0 1/2 + 1/3 = 3/6 + 2/6 = 5/6',
+       note:'Para 1/2 + 1/3: el denominador común es 6 (el mínimo número que es múltiplo de 2 y de 3).'},
+      {type:'quiz',q:'¿Cuánto es 1/4 + 1/4?',opts:['2/8','2/4','1/8','1/2'],ans:1,
+       ok:'Bien. Mismo denominador: 1/4 + 1/4 = 2/4. (Que también se puede simplificar a 1/2.)',
+       err:'Cuando los denominadores son iguales, solo sumás los numeradores: 1 + 1 = 2, y el denominador queda 4.'},
+      {type:'concept',tag:'multiplicar fracciones',tagStyle:'background:#E1F5EE;color:#085041',
+       title:'Multiplicar es más simple de lo que parece',
+       body:'Multiplicás numerador con numerador, y denominador con denominador. Sin necesitar denominador común.',
+       formula:'2/3 × 3/4 = (2×3)/(3×4) = 6/12 = 1/2',
+       note:'Después de multiplicar, fijate si podés simplificar la fracción resultante.'},
+      {type:'quiz',q:'¿Cuánto es 1/2 × 2/3?',opts:['3/6','2/6','1/3','2/5'],ans:2,
+       ok:'Correcto. 1×2 = 2 arriba, 2×3 = 6 abajo → 2/6 = 1/3.',
+       err:'1/2 × 2/3 = (1×2)/(2×3) = 2/6 = 1/3. Numeradores entre sí, denominadores entre sí.'},
+      {type:'quiz',q:'Simplificá: 6/9',opts:['3/4','2/3','1/2','6/9'],ans:1,
+       ok:'Exacto. MCD(6,9) = 3. Dividís ambos por 3: 6/9 = 2/3.',
+       err:'Buscá el máximo número que divide a ambos. MCD(6,9) = 3 → 6÷3=2, 9÷3=3 → 2/3.'},
+    ]
+  },
+  desp:{
+    color:'#FAECE7',accent:'#993C1D',name:'Despeje de x',
+    steps:[
+      {type:'concept',tag:'¿qué es despejar?',tagStyle:'background:#FAECE7;color:#712B13',
+       title:'Despejar es dejar la x sola',
+       body:'Una ecuación dice que dos cosas son iguales. Tu objetivo es mover todos los números al otro lado para que x quede sola. La regla de oro: lo que hacés de un lado, lo hacés del otro.',
+       formula:'x + 3 = 7 \u00a0→\u00a0 x = 7 − 3 \u00a0→\u00a0 x = 4',
+       note:'Si algo está sumando, lo pasás restando. Si multiplica, lo pasás dividiendo.'},
+      {type:'quiz',q:'x + 5 = 12  →  x = ?',opts:['17','7','60','5'],ans:1,
+       ok:'Bien. Restás 5 de los dos lados: x = 12 − 5 = 7.',
+       err:'Pasás el 5 restando al otro lado: x = 12 − 5 = 7.'},
+      {type:'concept',tag:'multiplicación y división',tagStyle:'background:#FAECE7;color:#712B13',
+       title:'Si la x está multiplicada, dividís',
+       body:'Cuando x tiene un número multiplicándola, dividís ambos lados por ese número para aislarla.',
+       formula:'3x = 15 \u00a0→\u00a0 x = 15 ÷ 3 \u00a0→\u00a0 x = 5',
+       note:'Y al revés: si x está dividida, multiplicás. x/4 = 3 → x = 3 × 4 = 12.'},
+      {type:'quiz',q:'2x = 18  →  x = ?',opts:['16','36','9','2'],ans:2,
+       ok:'Correcto. Dividís los dos lados por 2: x = 18 ÷ 2 = 9.',
+       err:'Si 2x = 18, dividís ambos lados por 2: x = 9.'},
+      {type:'concept',tag:'dos pasos',tagStyle:'background:#FAECE7;color:#712B13',
+       title:'Ecuaciones con dos operaciones',
+       body:'Cuando hay suma y multiplicación, primero resolvés la suma (pasás el número al otro lado), y después la multiplicación.',
+       formula:'2x + 3 = 11 \u00a0→\u00a0 2x = 8 \u00a0→\u00a0 x = 4',
+       note:'Primero aislás el término con x, después aislás la x.'},
+      {type:'quiz',q:'3x − 6 = 9  →  x = ?',opts:['1','5','3','6'],ans:1,
+       ok:'Excelente. 3x = 15 → x = 5. Lo resolviste en dos pasos.',
+       err:'Paso 1: sumás 6 → 3x = 15. Paso 2: dividís por 3 → x = 5.'},
+      {type:'quiz',q:'x/2 + 1 = 4  →  x = ?',opts:['6','10','3','8'],ans:0,
+       ok:'Perfecto. Restás 1 → x/2 = 3. Multiplicás por 2 → x = 6.',
+       err:'x/2 + 1 = 4 → x/2 = 3 → x = 6. Primero sacás el +1, luego deshacés la división.'},
+    ]
+  }
+};
+
+let cur={topic:null,step:0,correct:0,total:0,answered:false};
+
+function goHome(){show('home');cur={topic:null,step:0,correct:0,total:0,answered:false}}
+function replayTopic(){startTopic(cur.topic)}
+
+function show(id){
+  ['home','lesson','done'].forEach(s=>document.getElementById(s).classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+
+function startTopic(key){
+  cur={topic:key,step:0,correct:0,total:0,answered:false};
+  show('lesson');
+  renderStep();
+}
+
+function renderStep(){
+  const t=TOPICS[cur.topic];
+  const steps=t.steps;
+  const s=steps[cur.step];
+  const pct=Math.round((cur.step/steps.length)*100);
+  document.getElementById('prog').style.width=pct+'%';
+  document.getElementById('step-lbl').textContent='Paso '+(cur.step+1)+' de '+steps.length+' · '+t.name;
+  
+  const body=document.getElementById('lesson-body');
+  const next=document.getElementById('btn-next');
+  
+  if(s.type==='concept'){
+    body.innerHTML=`<div class="concept-card anim">
+      <span class="concept-tag" style="${s.tagStyle}">${s.tag}</span>
+      <div class="concept-title">${s.title}</div>
+      <div class="concept-body">${s.body}</div>
+      <div class="formula-box">${s.formula}</div>
+      <div class="concept-body" style="font-size:13px;color:var(--color-text-tertiary)">${s.note}</div>
+    </div>`;
+    next.textContent='Entendido →';
+    cur.answered=true;
+  } else {
+    const quizTotal=steps.filter(x=>x.type==='quiz').length;
+    const quizDone=steps.slice(0,cur.step).filter(x=>x.type==='quiz').length;
+    body.innerHTML=`<div class="ex-card anim">
+      <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:.75rem">pregunta ${quizDone+1} de ${quizTotal}</div>
+      <div class="ex-q">${s.q}</div>
+      <div class="opts" id="opts-wrap">${s.opts.map((o,i)=>`<button class="opt" onclick="pick(${i})">${o}</button>`).join('')}</div>
+      <div class="fb-box" id="fb"></div>
+      <div style="margin-top:.25rem"><span class="hint-toggle" onclick="toggleHint()">ver una pista</span><div class="hint-content" id="hint-box">Pensá en la definición que vimos antes. ¿Qué operación está aplicando?</div></div>
+    </div>`;
+    next.textContent='Siguiente →';
+    cur.answered=false;
+  }
+  next.style.opacity=cur.answered?'1':'.4';
+  next.disabled=!cur.answered;
+}
+
+function toggleHint(){
+  const h=document.getElementById('hint-box');
+  h.style.display=h.style.display==='block'?'none':'block';
+}
+
+function pick(i){
+  if(cur.answered) return;
+  cur.answered=true;
+  cur.total++;
+  const s=TOPICS[cur.topic].steps[cur.step];
+  const opts=document.querySelectorAll('.opt');
+  const fb=document.getElementById('fb');
+  opts.forEach((o,j)=>o.classList.add('locked'));
+  fb.style.display='block';
+  if(i===s.ans){
+    cur.correct++;
+    opts[i].classList.add('correct');
+    fb.className='fb-box fb-ok';
+    fb.textContent=s.ok;
+  } else {
+    opts[i].classList.add('wrong');
+    opts[s.ans].classList.add('correct');
+    fb.className='fb-box fb-err';
+    fb.textContent=s.err;
+  }
+  const next=document.getElementById('btn-next');
+  next.style.opacity='1';
+  next.disabled=false;
+}
+
+function nextStep(){
+  cur.step++;
+  if(cur.step>=TOPICS[cur.topic].steps.length){showDone();return;}
+  cur.answered=false;
+  renderStep();
+}
+
+function showDone(){
+  const pct=cur.total>0?Math.round((cur.correct/cur.total)*100):100;
+  const stars=pct>=80?'★★★':pct>=50?'★★☆':'★☆☆';
+  const msgs=['Seguí practicando, vas por buen camino.','Muy bien, estás entendiendo la idea.','Excelente, lo dominás perfectamente.'];
+  const msgIdx=pct>=80?2:pct>=50?1:0;
+  document.getElementById('done-stars').textContent=stars;
+  document.getElementById('done-score').textContent=cur.correct+'/'+cur.total+' correctas';
+  document.getElementById('done-msg').textContent=msgs[msgIdx];
+  document.getElementById('done-pills').innerHTML=`
+    <div class="xp-pill">Precisión <span>${pct}%</span></div>
+    <div class="xp-pill">Tema <span>${TOPICS[cur.topic].name}</span></div>
+  `;
+  show('done');
+}
+</script>
